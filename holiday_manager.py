@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 import json
 from bs4 import BeautifulSoup
 import requests
@@ -14,14 +14,14 @@ class Holiday:
     def __init__(self, name, date):
         self._name = name
         self._date = date
+        # print(type(date))
 
     def __str__ (self):
         # String output
-        _output = str()(self._name) + ', ' + str(self._date)
         # Holiday output when printed.
-        return _output
-          
-           
+        return f"{self._name} ({self._date})"
+
+
 # -------------------------------------------
 # The HolidayList class acts as a wrapper and container
 # For the list of holidays
@@ -88,7 +88,7 @@ class HolidayList:
             for item in self.innerHolidays:
                 temp = {}
                 temp['name'] = item._name
-                temp['date'] = str(item._date)
+                temp['date'] = item._date
                 output_list.append(temp)
             json.dump(output_list, j, indent = 4)
         print('File saved.')
@@ -110,9 +110,9 @@ class HolidayList:
                     '%s %s' % tempDate, 
                     '%b %d %Y',
                 )
-                date = formatDate.strftime('%Y-%m-%d')
+                # date = formatDate.strftime('%Y-%m-%d')
                 name = row.find('a').text
-                newHoliday = Holiday(name, date)
+                newHoliday = Holiday(name, formatDate)
                 self.innerHolidays.append(newHoliday)
         return
 
@@ -130,17 +130,17 @@ class HolidayList:
 
     def filter_holidays_by_week(self, year, week_number):
         # Use a Lambda function to filter by week number and save this as holidays, use the filter on innerHolidays
-        filterHolidays = list(filter(lambda x: x.date.isocalendar()[1] == week_number 
-            and x.date.isocalendar()[0] == year, self.innerHolidays))
+        filterHolidays = list(filter(lambda x: x._date.isocalendar()[1] == week_number 
+            and x._date.isocalendar()[0] == year, self.innerHolidays))
         # Week number is part of the the Datetime object
         # Cast filter results as list
         # return your holidays
         return filterHolidays
 
 
-    def displayHolidaysInWeek(self, holidayList):
+    def displayHolidaysInWeek(self, HolidayList):
         # Use your filter_holidays_by_week to get list of holidays within a week as a parameter
-        for i in holidayList:
+        for i in HolidayList:
             print(i)
         # Output formated holidays in the week. 
         return
@@ -267,6 +267,7 @@ def menuView(HolidayList):
         if weekInput == current_week and yearInput == current_year:
             HolidayList.viewCurrentWeek()
             weekView = True
+            return weekView
         elif weekInput > 0 and weekInput < 53:
             print('These are the holidays: ')
             HolidayList.displayHolidaysInWeek(HolidayList.filter_holidays_by_week(yearInput, weekInput))
