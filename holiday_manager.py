@@ -1,4 +1,3 @@
-from calendar import week
 from datetime import datetime
 import json
 from bs4 import BeautifulSoup
@@ -21,10 +20,6 @@ class Holiday:
         _output = str()(self._name) + ', ' + str(self._date)
         # Holiday output when printed.
         return _output
-    
-    def getValues(self):
-        valueList = [self._name, self._date]
-        return valueList
           
            
 # -------------------------------------------
@@ -135,7 +130,8 @@ class HolidayList:
 
     def filter_holidays_by_week(self, year, week_number):
         # Use a Lambda function to filter by week number and save this as holidays, use the filter on innerHolidays
-        filterHolidays = list(filter(lambda a: a._date.isocalendar().week == week_number and a._date.isocalendar().year == year, self.innerHolidays))
+        filterHolidays = list(filter(lambda x: x.date.isocalendar()[1] == week_number 
+            and x.date.isocalendar()[0] == year, self.innerHolidays))
         # Week number is part of the the Datetime object
         # Cast filter results as list
         # return your holidays
@@ -272,7 +268,7 @@ def menuView(HolidayList):
             HolidayList.viewCurrentWeek()
             weekView = True
         elif weekInput > 0 and weekInput < 53:
-            print('These are the holidays for ' + str(yearInput) + ' week ' + str(weekInput) + ': ')
+            print('These are the holidays: ')
             HolidayList.displayHolidaysInWeek(HolidayList.filter_holidays_by_week(yearInput, weekInput))
             weekView = True
             return weekView
@@ -309,7 +305,7 @@ def menuSave(HolidayList):
     # return to menu
     return
 
-def menuExit(useManager):
+def menuExit():
     print('Exit')
     print('=====')
     userExit = False
@@ -321,14 +317,13 @@ def menuExit(useManager):
             print('Goodbye!')
             userExit = True
             useManager = False
-            return useManager
     # if no, return to menu
         elif 'n' in exitInput.lower():
             print('Returning to menu...')
             return
         else:
             print('Sorry, issue occurred.')
-    return
+    return useManager
 
 def main():
     # Large Pseudo Code steps
@@ -376,7 +371,7 @@ def main():
                 menuView(mainHolidayList)
                 menuOption = True
             elif menuInput == 5:
-                menuExit(useManager)
+                useManager = menuExit()
                 menuOption = True
             else:
                 print('Oops! Error occurred. Please try again.')
@@ -384,7 +379,6 @@ def main():
     # 5. Take user input for their action based on Menu and check the user input for errors
     # 6. Run appropriate method from the HolidayList object depending on what the user input is
     # 7. Ask the User if they would like to Continue, if not, end the while loop, ending the program.  If they do wish to continue, keep the program going. 
-
 
 if __name__ == "__main__":
     main();
